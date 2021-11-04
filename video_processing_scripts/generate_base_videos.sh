@@ -17,7 +17,7 @@ do
     width=1920
     min=10
 
-    output_video=${output_dir}${name}
+    output_video=${output_dir}/${name}
 
     ffmpeg -y -i ${file} -ss 0 -t ${min}:00 \
         -vf scale=${width}:${height} \

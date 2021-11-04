@@ -14,7 +14,7 @@ def fetch_chunk_frames(cap, n_chunk_frames, step_frame, size=None):
         if not ret:
             break
         if f % step_frame == 0:
-            print(f)
+            #print(f)
             frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
             if size is not None:
                 frame = cv2.resize(frame, size)
