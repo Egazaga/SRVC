@@ -1,6 +1,7 @@
 import cv2
 import numpy as np
 
+
 def fetch_chunk_frames(cap, n_chunk_frames, step_frame, size=None):
     frames = []
     cap_type = 'cv2_cap' if isinstance(cap, cv2.VideoCapture) else 'yuv_cap'
@@ -14,12 +15,13 @@ def fetch_chunk_frames(cap, n_chunk_frames, step_frame, size=None):
         if not ret:
             break
         if f % step_frame == 0:
-            #print(f)
+            # print(f)
             frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
             if size is not None:
                 frame = cv2.resize(frame, size)
             frames.append(frame)
     return frames
+
 
 def get_config(args):
     start_time = args.start_time

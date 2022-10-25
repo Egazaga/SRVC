@@ -1,6 +1,5 @@
 import argparse
 import os
-import pathlib
 import pickle
 import time
 from collections import deque
@@ -35,7 +34,8 @@ parser.add_argument('--single_checkpoint', type=bool, default=False, help='Run t
 parser.add_argument('--crop_augment', type=bool, default=True, help='Add random crops augmentation')
 parser.add_argument('--l1_loss', type=bool, default=False, help='Use L1 loss instead of L2')
 parser.add_argument('--dump_samples', type=bool, default=False, help='Save the inference sample frames')
-parser.add_argument('--hr_size', type=str, default='1920,1080', help='Comma-separated HR video size, i.e.,  width,height')
+parser.add_argument('--hr_size', type=str, default='1920,1080',
+                    help='Comma-separated HR video size, i.e.,  width,height')
 parser.add_argument('--lr_size', type=str, default='480,270', help='Comma-separated LR video size, i.e., width,height')
 parser.add_argument('--online', type=bool, default=False,
                     help='Uses the model trained till the beginning of each chunk for inference on that chunk (only '
@@ -43,16 +43,16 @@ parser.add_argument('--online', type=bool, default=False,
 
 args = parser.parse_args()
 
+
 def gen_video():
     cnfg = get_config(args)
     chunk_no = args.ff_nchunks - 1
     total_frames = args.ff_nchunks * cnfg['boundary_threshold']
-    hr_cap = VideoCaptureYUV(cnfg['hr_path'], cnfg['hr_size']) if cnfg['hr_vid_format'] == 'yuv' else cv2.VideoCapture(
-            cnfg['hr_path'])
+    hr_cap = VideoCaptureYUV(cnfg['hr_path'], cnfg['hr_size']) if cnfg['hr_vid_format'] == 'yuv' \
+        else cv2.VideoCapture(cnfg['hr_path'])
     if args.lr_video is not None:
-        lr_cap = VideoCaptureYUV(cnfg['lr_path'], cnfg['lr_size']) if cnfg[
-                                                                          'lr_vid_format'] == 'yuv' else cv2.VideoCapture(
-                cnfg['lr_path'])
+        lr_cap = VideoCaptureYUV(cnfg['lr_path'], cnfg['lr_size']) if cnfg['lr_vid_format'] == 'yuv' \
+            else cv2.VideoCapture(cnfg['lr_path'])
     else:
         lr_cap = None
 
@@ -100,7 +100,7 @@ def gen_video():
         hr_norm = chunk_frames_norm[r]
         lr_norm = chunk_labels_norm[r]
         total_frames += 1
-        yield (lr_norm, hr_norm, chunk_no)
+        yield lr_norm, hr_norm, chunk_no
     hr_cap.release()
     if lr_cap is not None:
         lr_cap.release()
@@ -137,7 +137,6 @@ dataset = tf.data.Dataset.from_generator(gen_video,
 dataset = dataset.batch(args.batch_size).map(augment).repeat(1).prefetch(100)
 iter = dataset.make_one_shot_iterator()
 lr, hr, chunk_no = iter.get_next()
-
 
 # Super-resolve
 sr = getattr(models, args.model_name)(lr)
@@ -232,7 +231,7 @@ def inference_loop(sess):
             actual_chunk_no_, model_metrics_, cubic_metrics_ = sess.run([chunk_no, model_metrics, cubic_metrics])
         elif args.dump_samples:
             rgb_sr_01_, rgb_hr_01_, rgb_cubic_01_, actual_chunk_no_, model_metrics_, cubic_metrics_ = sess.run(
-                    [rgb_sr_01, rgb_hr_01, rgb_cubic_01, chunk_no, model_metrics, cubic_metrics])
+                [rgb_sr_01, rgb_hr_01, rgb_cubic_01, chunk_no, model_metrics, cubic_metrics])
             np.save('%s/rec_%06d.npy' % (image_path, i), np.array(rgb_sr_01_))
             np.save('%s/org_%06d.npy' % (image_path, i), np.array(rgb_hr_01_))
             np.save('%s/cub_%06d.npy' % (image_path, i), np.array(rgb_cubic_01_))
@@ -290,12 +289,12 @@ def training_loop(sess):
         if i % 500 == 0:
             t0 = time.time()
             res_ = sess.run(
-                    {'loss': loss, 'train': train, 'model_metrics': model_metrics, 'cubic_metrics': cubic_metrics},
-                    feed_dict)
+                {'loss': loss, 'train': train, 'model_metrics': model_metrics, 'cubic_metrics': cubic_metrics},
+                feed_dict)
             t1 = time.time()
             print('bechmarking_time=%.3f, mean_train_iter_time=%.3f sec' % (t1 - t0, np.mean(train_iter_time)))
             print('Chunk: %d, Iteration: %d, Loss: %f, inference time: %.3f' % (
-                    chunk_no_, i, res_['loss'], dt))
+                chunk_no_, i, res_['loss'], dt))
             print('Bicubic: ', res_['cubic_metrics'])
             print('Model:', res_['model_metrics'])
         else:

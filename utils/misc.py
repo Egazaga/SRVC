@@ -6,13 +6,14 @@ def get_metrics(im1, im2):
     # Assumes im1 and im2 are in RGB space with float values in range [0, 1]
     im1 = tf.clip_by_value(im1, 0, 1)
     im2 = tf.clip_by_value(im2, 0, 1)
-    im1_y = tf.image.rgb_to_yuv(im1)[...,0]
-    im2_y = tf.image.rgb_to_yuv(im2)[...,0]
+    im1_y = tf.image.rgb_to_yuv(im1)[..., 0]
+    im2_y = tf.image.rgb_to_yuv(im2)[..., 0]
     psnr_y = tf.reduce_mean(tf.image.psnr(im1_y, im2_y, max_val=1.))
     psnr_rgb = tf.reduce_mean(tf.image.psnr(im1, im2, max_val=1.))
     ssim = tf.reduce_mean(tf.image.ssim(im1, im2, max_val=1.))
     metrics = {'ssim': ssim, 'psnr_y': psnr_y, 'psnr_rgb': psnr_rgb}
     return metrics
+
 
 class SaveHelper:
     def __init__(self, graph, map_fun):
