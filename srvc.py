@@ -17,7 +17,7 @@ parser.add_argument('--hr_video', type=str, default=None, help='Directory for th
 parser.add_argument('--lr_video', type=str, default=None, help='Directory for the LR video')
 parser.add_argument('--save_path', type=str, default=None, help='Directory to save the results')
 parser.add_argument('--load_path', type=str, default='', help='Directory for loading the SR model checkpoint(s)')
-parser.add_argument('--model_name', type=str, default=None, help='SR model variant')
+parser.add_argument('--model_name', type=str, default="srvc", help='SR model variant')
 parser.add_argument('--lr', type=float, default=1e-3, help='Learning rate')
 parser.add_argument('--batch_size', type=int, default=1, help='Train batch size')
 parser.add_argument('--start_time', type=float, default=0, help='Training data start time in the video')
@@ -29,15 +29,16 @@ parser.add_argument('--num_epochs', type=int, default=1, help='Number of epochs'
 parser.add_argument('--fps', type=str, default='24',
                     help='Video framerate (only required for raw video files); it also accepts formats like 24000/1001')
 parser.add_argument('--ff_nchunks', type=int, default=0, help='fast-forward n chunks')
-parser.add_argument('--inference', type=bool, default=False, help='Run inference test first')
-parser.add_argument('--single_checkpoint', type=bool, default=False, help='Run the inference using only one checkpoint')
+parser.add_argument('--inference', default=False, action="store_true", help='Run inference test first')
+parser.add_argument('--single_checkpoint', action="store_true", default=False,
+                    help='Run the inference using only one checkpoint')
 parser.add_argument('--crop_augment', type=bool, default=True, help='Add random crops augmentation')
 parser.add_argument('--l1_loss', type=bool, default=False, help='Use L1 loss instead of L2')
 parser.add_argument('--dump_samples', type=bool, default=False, help='Save the inference sample frames')
 parser.add_argument('--hr_size', type=str, default='1920,1080',
                     help='Comma-separated HR video size, i.e.,  width,height')
 parser.add_argument('--lr_size', type=str, default='480,270', help='Comma-separated LR video size, i.e., width,height')
-parser.add_argument('--online', type=bool, default=False,
+parser.add_argument('--online', default=False, action="store_true",
                     help='Uses the model trained till the beginning of each chunk for inference on that chunk (only '
                          'effects the inference process)')
 
