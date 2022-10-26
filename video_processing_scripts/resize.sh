@@ -33,7 +33,7 @@ do
     do
         input_video=${file}
         echo ${input_video}
-        output_prefix="${resize_dir}/h${format}/${name}_${width}x${height}"
+        output_prefix="${resize_dir}/${name}_h${format}_${width}x${height}"
         
         # crf range
         for crf in 10 20 25 30 35 40;
